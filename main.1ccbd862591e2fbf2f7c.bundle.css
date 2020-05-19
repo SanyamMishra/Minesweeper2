@@ -1,0 +1,6 @@
+:root{--main-background-color: #0E161D;--grid-background-color: transparent;--revealed-cell-color: #1B262F;--cell-border-color: #17303D;--cell-text-color: #5DADCF;--flag-color: #AFD29E;--bomb-background-color: transparent;--bomb-foreground-color: #D04040}html,body{width:100%;height:100%;padding:0;margin:0}body{display:flex;justify-content:center;align-items:center;background-color:var(--main-background-color);font-family:Roboto;font-weight:500;font-size:20px}
+
+.minesweeper-grid{width:600px;height:600px;background-color:var(--grid-background-color);display:grid;grid-template-columns:repeat(10, 1fr);grid-template-rows:repeat(10, 1fr)}
+
+.cell{border:1px solid var(--cell-border-color);color:var(--cell-text-color);margin:3px;display:flex;justify-content:center;align-items:center;border-radius:40%}.cell.revealed{background-color:var(--revealed-cell-color)}.cell.flagged{color:var(--flag-color)}.cell.mined{background-color:var(--bomb-background-color);color:var(--bomb-foreground-color)}
+
