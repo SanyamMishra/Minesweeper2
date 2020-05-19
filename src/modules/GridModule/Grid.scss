@@ -1,0 +1,9 @@
+.minesweeper-grid {
+  width: 600px;
+  height: 600px;
+  background-color: var(--grid-background-color);
+
+  display: grid;
+  grid-template-columns: repeat(10,1fr);
+  grid-template-rows: repeat(10,1fr);
+}

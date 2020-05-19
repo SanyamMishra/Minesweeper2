@@ -1,0 +1,22 @@
+.cell {
+  border: 1px solid var(--cell-border-color);
+  color: var(--cell-text-color);
+  margin: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 40%;
+}
+
+.cell.revealed {
+  background-color: var(--revealed-cell-color);
+}
+
+.cell.flagged {
+  color: var(--flag-color);
+}
+
+.cell.mined {
+  background-color: var(--bomb-background-color);
+  color: var(--bomb-foreground-color);
+}
