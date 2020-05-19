@@ -21,8 +21,8 @@ export class MainMenu {
     this._DOMElement = getElement(moduleHtml);
     this.menuHeader = new MenuHeader();
     this.smallGridButton = new MenuButton('8x8', this.startSmallGame, 'fas fa-cube');
-    this.mediumGridButton = new MenuButton('10x10', this.startMediumGame, undefined, '/fonts/cube3x.svg');
-    this.largeGridButton = new MenuButton('12x12', this.startLargeGame, undefined, '/fonts/cube5x.svg');
+    this.mediumGridButton = new MenuButton('10x10', this.startMediumGame, undefined, 'fonts/cube3x.svg');
+    this.largeGridButton = new MenuButton('12x12', this.startLargeGame, undefined, 'fonts/cube5x.svg');
 
     this.config();
     this.rendor();
