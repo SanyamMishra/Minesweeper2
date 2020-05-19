@@ -20,26 +20,26 @@ export class InGameMenu {
   constructor() {
     this._DOMElement = getElement(moduleHtml);
     this.menuHeader = new MenuHeader();
-    this.resumeButton = new MenuButton('ResuMe', this.resumeGame.bind(this), 'fas fa-play');
-    this.restartButton = new MenuButton('RestARt', this.restartGame.bind(this), 'fas fa-undo-alt');
-    this.homeButton = new MenuButton('HoMe', this.goToHome.bind(this), 'fas fa-home');
-    this.restartConfirmPopup = new Popup('RestARt GAMe', 'ARe you suRe? you Will lose tHe cuRRent GAMe', [
+    this.resumeButton = new MenuButton('Resume', this.resumeGame.bind(this), 'fas fa-play');
+    this.restartButton = new MenuButton('Restart', this.restartGame.bind(this), 'fas fa-undo-alt');
+    this.homeButton = new MenuButton('Home', this.goToHome.bind(this), 'fas fa-home');
+    this.restartConfirmPopup = new Popup('Restart Game', 'Are you sure? You will lose the current game', [
       {
-        text: 'yes',
+        text: 'Yes',
         action: this.confirmRestartGame
       },
       {
-        text: 'no'
+        text: 'No'
       }
     ]);
 
-    this.goToHomeConfirmPopup = new Popup('Go to HoMe', 'ARe you suRe? you Will lose tHe cuRRent GAMe', [
+    this.goToHomeConfirmPopup = new Popup('Go to home', 'Are you sure? You will lose the current game', [
       {
-        text: 'yes',
+        text: 'Yes',
         action: this.confirmGoToHome
       },
       {
-        text: 'no'
+        text: 'No'
       }
     ]);
 

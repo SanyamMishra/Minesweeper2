@@ -62,16 +62,16 @@ export class Game {
     this.smallGrid = new Grid(smallGridOptions);
     this.mediumGrid = new Grid(mediumGridOptions);
     this.largeGrid = new Grid(largeGridOptions);
-    this.gameWonPopup = new Popup('Won', 'you Won tHe GAMe!! ✨🎊', [
+    this.gameWonPopup = new Popup('Congratulations ✨🎊', 'You won the Game!!', [
       {
-        text: 'cool',
+        text: 'Cool',
         action: () => GameState.state = State.NOT_STARTED
       }
     ]);
 
-    this.gameLosePopup = new Popup('lose', 'you lose tHe GAMe 🙁', [
+    this.gameLosePopup = new Popup('Oh No 🙁', 'You lose the Game', [
       {
-        text: 'okAy',
+        text: 'Okay',
         action: () => GameState.state = State.NOT_STARTED
       }
     ]);
