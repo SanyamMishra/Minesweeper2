@@ -1,9 +1,14 @@
-.minesweeper-grid {
-  width: 600px;
-  height: 600px;
-  background-color: var(--grid-background-color);
+@import './../../mixins';
+@import './../../variables';
+
+.grid-holder {
+  @include fullScreen($grid-z-index);
+  @include flexCenter;
+}
+
+.grid {
+  width: 80vh;
+  height: 80vh;
 
   display: grid;
-  grid-template-columns: repeat(10,1fr);
-  grid-template-rows: repeat(10,1fr);
 }

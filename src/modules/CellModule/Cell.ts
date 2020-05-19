@@ -1,29 +1,43 @@
+import { getElement } from '../../helpers';
+import { GameState, StateEvent, State } from '../../StateManager';
+
+import moduleHtml from './Cell.html';
 import './Cell.scss';
 
-enum CellIcons {
-  FLAG = 'fas fa-flag',
-  MINE = 'fas fa-bomb'
-};
+export enum CellPosition {
+  TOP_LEFT,
+  TOP,
+  TOP_RIGHT,
+  LEFT,
+  IN_BETWEEN,
+  RIGHT,
+  BOTTOM_LEFT,
+  BOTTOM,
+  BOTTOM_RIGHT
+}
 
 // Cell class
-export default class Cell {
+export class Cell {
   private _DOMElement: HTMLDivElement;
+  private borderRightElement: HTMLDivElement;
+  private borderBottomElement: HTMLDivElement;
+  private iconFlagElement: HTMLDivElement;
+  private iconMineElement: HTMLDivElement;
+  private mineCountElement: HTMLDivElement;
   private _mined: boolean;
   private _revealed: boolean;
   private _flagged: boolean;
   private _mineCount: number;
 
   // create a new cell
-  constructor(private _x: number, private _y: number) {
+  constructor(private _x: number, private _y: number, private cellPosition: CellPosition) {
     // create the DOM representation of the cell
-    this._DOMElement = document.createElement('div');
-    this.DOMElement.className = 'cell';
-    this.DOMElement.dataset.x = this.x.toString();
-    this.DOMElement.dataset.y = this.y.toString();
-
-    // **** THIS WILL BE DONE BY THE GRID ITSELF ****
-    // add the cell to the UI
-    // document.querySelector('.minesweeper-grid').append(this.domElement);
+    this._DOMElement = getElement(moduleHtml) as HTMLDivElement;
+    this.borderRightElement = this.DOMElement.querySelector('.cell-border--right') as HTMLDivElement;
+    this.borderBottomElement = this.DOMElement.querySelector('.cell-border--bottom') as HTMLDivElement;
+    this.iconFlagElement = this.DOMElement.querySelector('.cell-icon--flag') as HTMLDivElement;
+    this.iconMineElement = this.DOMElement.querySelector('.cell-icon--mine') as HTMLDivElement;
+    this.mineCountElement = this.DOMElement.querySelector('.cell-mine-count') as HTMLDivElement;
 
     // set the cell flags
     this._mined = false;
@@ -32,6 +46,37 @@ export default class Cell {
 
     // setting the neighbourhood mines count
     this._mineCount = 0;
+
+    this.config();
+    this.render();
+  }
+
+  private config() {
+    GameState.listen(StateEvent.STATE_CHANGED, eventData => {
+      if (eventData.data.newState === State.LOSE || eventData.data.newState === State.WON) {
+        this.reset();
+      }
+    });
+  }
+
+  private render() {
+    this.DOMElement.dataset.x = this.x.toString();
+    this.DOMElement.dataset.y = this.y.toString();
+
+    switch (this.cellPosition) {
+      case CellPosition.TOP_RIGHT:
+      case CellPosition.RIGHT:
+        this.borderRightElement.classList.add('hide');
+        break;
+      case CellPosition.BOTTOM_LEFT:
+      case CellPosition.BOTTOM:
+        this.borderBottomElement.classList.add('hide');
+        break;
+      case CellPosition.BOTTOM_RIGHT:
+        this.borderBottomElement.classList.add('hide');
+        this.borderRightElement.classList.add('hide');
+        break;
+    }
   }
 
   // return the X coordinate of the cell
@@ -55,12 +100,6 @@ export default class Cell {
 
   // add a mine to the the cell
   set mined(value) {
-    if (value === true) {
-      this.DOMElement.classList.add('containsMine');
-    } else {
-      this.DOMElement.classList.remove('containsMine');
-    }
-
     this._mined = value;
   }
 
@@ -74,15 +113,13 @@ export default class Cell {
       // mark this cell as flagged
       if (this.revealed || this.flagged) return;
 
-      this.DOMElement.innerHTML = `<i class="${CellIcons.FLAG}"></i>`;
-      this.DOMElement.classList.add('flagged');
+      this.iconFlagElement.classList.remove('hide');
       this._flagged = true;
     } else {
       // remove flag from the cell
       if (!this.flagged) return;
 
-      this.DOMElement.innerHTML = '';
-      this.DOMElement.classList.remove('flagged');
+      this.iconFlagElement.classList.add('hide');
       this._flagged = false;
     }
   }
@@ -114,11 +151,12 @@ export default class Cell {
     if (!forceReveal && this.flagged) return 0;
 
     if (this.mined) {
-      this.DOMElement.innerHTML = `<i class="${CellIcons.MINE}"></i>`;
-      this.DOMElement.classList.add('mined');
+      this.iconFlagElement.classList.add('hide');
+      this.iconMineElement.classList.remove('hide');
     } else {
       if (this.mineCount) {
-        this.DOMElement.innerHTML = this.mineCount.toString();
+        this.mineCountElement.innerHTML = this.mineCount.toString();
+        this.mineCountElement.classList.remove('hide');
       }
       this.DOMElement.classList.add('revealed');
     }
@@ -155,8 +193,15 @@ export default class Cell {
     return false;
   }
 
-  reset() {
-    this.DOMElement.innerHTML = '';
+  private reset() {
+    this.iconFlagElement.classList.add('hide');
+    this.iconMineElement.classList.add('hide');
+    this.mineCountElement.classList.add('hide');
+    this.mineCountElement.innerHTML = '';
     this.DOMElement.className = 'cell';
+    this.mined = false;
+    this._revealed = false;
+    this.flagged = false;
+    this.mineCount = 0;
   }
 }

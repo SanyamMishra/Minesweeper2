@@ -1,0 +1,58 @@
+@import './../../mixins';
+@import './../../variables';
+
+.popup {
+  @include fullScreen($popup-z-index);
+  @include flexCenter;
+  background-color: rgba(255,255,255,0.8);
+  font-family: $font-family;
+  &-modal {
+    background-color: #fff;
+    width: 20rem;
+    border: 1px solid rgba(0,0,0,0.3);
+
+    &--header {
+      border-bottom: 1px solid rgba(0,0,0,0.3);
+      display: flex;
+      padding: 0.5rem;
+    }
+
+    &--header-text {
+      flex-grow: 1;
+    }
+
+    &--close-button {
+      cursor: pointer;
+    }
+
+    &--body {
+      padding: 0.5rem;
+    }
+
+    &--buttons {
+      padding: 0.5rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    &--button {
+      margin: 0 0 0 1rem;
+      cursor: pointer;
+      position: relative;
+
+      &:before {
+        content: "";
+        position: absolute;
+        bottom: -0.2rem;
+        width: 0;
+        height: 2px;
+        background-color: black;
+        transition: width 0.2s ease-in-out;
+      }
+
+      &:hover::before {
+        width: 100%;
+      }
+    }
+  }
+}

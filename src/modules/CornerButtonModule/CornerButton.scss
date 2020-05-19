@@ -1,0 +1,46 @@
+@import './../../mixins';
+@import './../../variables';
+
+$button-icon-size: 2.5rem;
+$corner-margin: 0.75rem;
+
+.corner-button {
+  position: absolute;
+  z-index: $corner-button-z-index;
+  cursor: pointer;
+
+  &.top-left {
+    top: $corner-margin;
+    left: $corner-margin;
+  }
+
+  &.top-right {
+    top: $corner-margin;
+    right: $corner-margin;
+  }
+
+  &.bottom-left {
+    bottom: $corner-margin;
+    left: $corner-margin;
+  }
+
+  &.bottom-right {
+    bottom: $corner-margin;
+    right: $corner-margin;
+  }
+
+  &--icon {
+    font-size: $button-icon-size;
+    @include flexCenter;
+    flex-basis: 70%;
+    transition: font-size 0.2s ease-in-out;
+
+    img {
+      width: $button-icon-size;
+    }
+  }
+
+  &:hover &--icon {
+    font-size: $button-icon-size + 0.5rem;
+  }
+}

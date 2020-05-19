@@ -1,0 +1,37 @@
+@import './../../mixins';
+@import './../../variables';
+
+$button-size: 16rem;
+$button-icon-size: 8rem;
+$button-text-size: 2.5rem;
+
+.menu-button {
+  display: inline-flex;
+  border: 0.1rem solid black;
+  width: $button-size;
+  height: $button-size;
+  flex-direction: column;
+  cursor: pointer;
+
+  &:hover &--text {
+    font-size: $button-text-size + 0.2rem;
+  }
+
+  &--icon {
+    font-size: $button-icon-size;
+    @include flexCenter;
+    flex-basis: 70%;
+
+    img {
+      width: $button-icon-size;
+    }
+  }
+
+  &--text {
+    font-size: $button-text-size;
+    font-family: $font-family;
+    @include flexCenter;
+    flex-basis: 30%;
+    transition: font-size 0.2s ease-in-out;
+  }
+}

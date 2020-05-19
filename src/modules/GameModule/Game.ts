@@ -1,145 +1,156 @@
+import { getElement } from '../../helpers';
+import { GameState, StateEvent, StateEventData, State } from './../../StateManager';
+
+import moduleHtml from './Game.html';
 import './Game.scss';
-import Grid from '../GridModule/Grid';
 
-type GameOptions = {
+import { MainMenu } from '../MainMenuModule/MainMenu';
+import { InGameMenu } from '../InGameMenuModule/InGameMenu';
+import { CornerButton, Corner } from '../CornerButtonModule/CornerButton';
+import { Grid, GridOptions } from '../GridModule/Grid';
+import { Popup } from '../PopupModule/Popup';
+
+const mineRevealGapTime = 50;
+
+const smallGridOptions: GridOptions = {
   gridSize: {
-    rowCount: number;
-    columnCount: number;
+    rowCount: 8,
+    columnCount: 8
   },
-  totalMines: number;
-}
+  totalMines: 9,
+  mineRevealGapTime
+};
 
-enum UserInteractionType { CLICK, CONTEXTMENU }
+const mediumGridOptions: GridOptions = {
+  gridSize: {
+    rowCount: 10,
+    columnCount: 10
+  },
+  totalMines: 15,
+  mineRevealGapTime
+};
 
-class GameState {
-  private static instance: GameState;
-  public started: boolean;
-  public isOver: boolean;
-
-  private constructor() {
-    this.started = false;
-    this.isOver = false;
-  }
-
-  static getInstance() {
-    if (!this.instance) {
-      this.instance = new GameState();
-    }
-
-    return this.instance;
-  }
-
-  reset() {
-    this.started = false;
-    this.isOver = false;
-  }
-}
+const largeGridOptions: GridOptions = {
+  gridSize: {
+    rowCount: 12,
+    columnCount: 12
+  },
+  totalMines: 25,
+  mineRevealGapTime
+};
 
 // Game class
-export default class Game {
-  private grid: Grid;
-  private gameState: GameState;
+export class Game {
+  private _DOMElement: HTMLElement;
+  private mainMenu: MainMenu;
+  private inGameMenu: InGameMenu;
+  private pauseButton: CornerButton;
+  private smallGrid: Grid;
+  private mediumGrid: Grid;
+  private largeGrid: Grid;
+  private gameWonPopup: Popup;
+  private gameLosePopup: Popup;
+
+  private showGameEndPopup: boolean;
 
   // create a new game environment
-  constructor(options: GameOptions) {
-    this.grid = new Grid(options.gridSize.rowCount, options.gridSize.columnCount, options.totalMines);
-    this.gameState = GameState.getInstance();
+  constructor() {
+    this._DOMElement = getElement(moduleHtml);
+    this.mainMenu = new MainMenu();
+    this.inGameMenu = new InGameMenu();
+    this.pauseButton = new CornerButton(Corner.TOP_LEFT, this.pauseButtonHandler.bind(this), 'fas fa-pause');
+    this.smallGrid = new Grid(smallGridOptions);
+    this.mediumGrid = new Grid(mediumGridOptions);
+    this.largeGrid = new Grid(largeGridOptions);
+    this.gameWonPopup = new Popup('Won', 'you Won tHe GAMe!! ✨🎊', [
+      {
+        text: 'cool',
+        action: () => GameState.state = State.NOT_STARTED
+      }
+    ]);
+
+    this.gameLosePopup = new Popup('lose', 'you lose tHe GAMe 🙁', [
+      {
+        text: 'okAy',
+        action: () => GameState.state = State.NOT_STARTED
+      }
+    ]);
+
+    this.showGameEndPopup = true;
 
     this.config();
+    this.render();
   }
 
   private config() {
-    this.grid.DOMElement.addEventListener('click', event => {
-      if (!event.target) return;
+    this.inGameMenu.hide();
+    this.pauseButton.hide();
+    this.smallGrid.hide();
+    this.mediumGrid.hide();
+    this.largeGrid.hide();
+    this.gameWonPopup.hide();
+    this.gameLosePopup.hide();
+    GameState.listen(StateEvent.MAIN_MENU_BUTTON_CLICKED, this.mainMenuButtonsHandler.bind(this));
+    GameState.listen(StateEvent.IN_GAME_MENU_BUTTON_CLICKED, this.inGameMenuButtonsHandler.bind(this));
 
-      const targetCell = (event.target as HTMLElement).closest('.cell');
-      if (targetCell) {
-        this.handleUserInteraction(targetCell as HTMLDivElement, UserInteractionType.CLICK);
+    GameState.listen(StateEvent.STATE_CHANGED, eventData => {
+      if (eventData.data.newState === State.NOT_STARTED) {
+        this.smallGrid.hide();
+        this.mediumGrid.hide();
+        this.largeGrid.hide();
+      } else if (eventData.data.newState === State.WON) {
+        this.showGameEndPopup && this.gameWonPopup.show();
+      } else if (eventData.data.newState === State.LOSE) {
+        this.showGameEndPopup && this.gameLosePopup.show();
       }
     });
-
-    this.grid.DOMElement.addEventListener('contextmenu', event => {
-      event.preventDefault();
-
-      if (!event.target) return;
-
-      const targetCell = (event.target as HTMLElement).closest('.cell');
-      if (targetCell) {
-        this.handleUserInteraction(targetCell as HTMLDivElement, UserInteractionType.CONTEXTMENU);
-      }
-    });
   }
 
-  private handleUserInteraction(cellDomElement: HTMLDivElement, interactionType: UserInteractionType) {
-    if (!cellDomElement.dataset.x || !cellDomElement.dataset.y) return;
-
-    const x = +cellDomElement.dataset.x;
-    const y = +cellDomElement.dataset.y;
-
-    // initialise the game if not started already
-    if (!this.gameState.started) this.init(x, y);
-
-    // analyse the move of the user
-    this.analyseMove({ x, y }, interactionType);
+  private render() {
+    this.DOMElement.querySelector('template#main-menu')?.replaceWith(this.mainMenu.DOMElement);
+    this.DOMElement.querySelector('template#in-game-menu')?.replaceWith(this.inGameMenu.DOMElement);
+    this.DOMElement.querySelector('template#pause-button')?.replaceWith(this.pauseButton.DOMElement);
+    this.DOMElement.querySelector('template#small-grid')?.replaceWith(this.smallGrid.DOMElement);
+    this.DOMElement.querySelector('template#medium-grid')?.replaceWith(this.mediumGrid.DOMElement);
+    this.DOMElement.querySelector('template#large-grid')?.replaceWith(this.largeGrid.DOMElement);
+    this.DOMElement.querySelector('template#game-won-popup')?.replaceWith(this.gameWonPopup.DOMElement);
+    this.DOMElement.querySelector('template#game-lose-popup')?.replaceWith(this.gameLosePopup.DOMElement);
   }
 
-  // initiate the game by placing the mines
-  init(x: number, y: number) {
-    const seedCell = this.grid.getCell(x, y);
-    this.grid.placeMines(seedCell);
-    this.gameState.started = true;
-  }
-
-  // check whether the game has finished successfully
-  checkForSuccess() {
-    const areAllMinedCellsFlagged = this.grid.mineCells.reduce((prev, mineCell) => prev ? mineCell.flagged : prev, true);
-    if (areAllMinedCellsFlagged || this.grid.unrevealedCellsCount === this.grid.totalMines) {
-      this.gameState.isOver = true;
-      alert('Congratulations! You Won!');
-      // this.reset();
+  private mainMenuButtonsHandler(eventData: StateEventData) {
+    GameState.state = State.RUNNING;
+    this.pauseButton.show();
+    switch (eventData.data) {
+      case 'smallGridButton':
+        this.smallGrid.show();
+        break;
+      case 'mediumGridButton':
+        this.mediumGrid.show();
+        break;
+      case 'largeGridButton':
+        this.largeGrid.show();
+        break;
     }
   }
 
-  // analyse the move of the player
-  analyseMove(cellCoordinates: { x: number, y: number }, interactionType: UserInteractionType) {
-    // get the cell from the coordinates
-    const cell = this.grid.getCell(cellCoordinates.x, cellCoordinates.y);
+  private inGameMenuButtonsHandler(eventData: StateEventData) {
+    this.showGameEndPopup = false;
+    GameState.state = State.LOSE;
 
-    if (interactionType === UserInteractionType.CLICK) {
-      const isRevealed = cell.reveal();
-      if (isRevealed !== 1) return;
-
-      this.grid.unrevealedCellsCount--;
-
-      // if cell is mined then reveal all the mines of the grid
-      // GAME OVER
-      if (cell.mined) {
-        // reveal all mines
-        this.gameState.isOver = true;
-        this.grid.revealAllMines();
-        return;
-      }
-
-      // if there was no mine in the neighbourhood of the cell,
-      // then look for mines in the neighbourhood of the neighbouring cells
-      if (!cell.mineCount) {
-        this.grid.forEachNeighbourhoodCell(cell, neighbourCell => this.analyseMove(
-          { x: neighbourCell.x, y: neighbourCell.y },
-          UserInteractionType.CLICK
-        ));
-      }
-    } else if (interactionType === UserInteractionType.CONTEXTMENU) {
-      cell.toggleFlag();
+    if (eventData.data === 'restartButton') {
+      GameState.state = State.RUNNING;
+    } else if (eventData.data === 'homeButton') {
+      GameState.state = State.NOT_STARTED;
     }
 
-    if (!this.gameState.isOver) {
-      this.checkForSuccess();
-    }
+    this.showGameEndPopup = true;
   }
 
-  // reset the game
-  reset() {
-    this.grid.reset();
-    this.gameState.reset();
+  private pauseButtonHandler() {
+    GameState.state = State.PAUSED;
+  }
+
+  get DOMElement() {
+    return this._DOMElement;
   }
 }
