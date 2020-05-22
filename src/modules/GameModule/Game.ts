@@ -9,6 +9,7 @@ import { InGameMenu } from '../InGameMenuModule/InGameMenu';
 import { CornerButton, Corner } from '../CornerButtonModule/CornerButton';
 import { Grid, GridOptions } from '../GridModule/Grid';
 import { Popup } from '../PopupModule/Popup';
+import { Timer } from "../TimerModule/Timer";
 
 const mineRevealGapTime = 50;
 
@@ -48,6 +49,7 @@ export class Game {
   private smallGrid: Grid;
   private mediumGrid: Grid;
   private largeGrid: Grid;
+  private timer: Timer;
   private gameWonPopup: Popup;
   private gameLosePopup: Popup;
 
@@ -62,6 +64,7 @@ export class Game {
     this.smallGrid = new Grid(smallGridOptions);
     this.mediumGrid = new Grid(mediumGridOptions);
     this.largeGrid = new Grid(largeGridOptions);
+    this.timer = new Timer('fas fa-clock');
     this.gameWonPopup = new Popup('Congratulations ✨🎊', 'You won the Game!!', [
       {
         text: 'Cool',
@@ -113,6 +116,7 @@ export class Game {
     this.DOMElement.querySelector('template#small-grid')?.replaceWith(this.smallGrid.DOMElement);
     this.DOMElement.querySelector('template#medium-grid')?.replaceWith(this.mediumGrid.DOMElement);
     this.DOMElement.querySelector('template#large-grid')?.replaceWith(this.largeGrid.DOMElement);
+    this.DOMElement.querySelector('template#timer')?.replaceWith(this.timer.DOMElement);
     this.DOMElement.querySelector('template#game-won-popup')?.replaceWith(this.gameWonPopup.DOMElement);
     this.DOMElement.querySelector('template#game-lose-popup')?.replaceWith(this.gameLosePopup.DOMElement);
   }

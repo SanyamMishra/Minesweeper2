@@ -1,0 +1,7 @@
+$corner-margin: 0.75rem;
+
+.game-counters {
+  position: absolute;
+  top: $corner-margin;
+  right: $corner-margin;
+}
