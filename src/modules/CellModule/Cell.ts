@@ -115,12 +115,14 @@ export class Cell {
 
       this.iconFlagElement.classList.remove('hide');
       this._flagged = true;
+      GameState.fire(StateEvent.CELL_FLAG_TOGGLE, this._flagged);
     } else {
       // remove flag from the cell
       if (!this.flagged) return;
 
       this.iconFlagElement.classList.add('hide');
       this._flagged = false;
+      GameState.fire(StateEvent.CELL_FLAG_TOGGLE, this._flagged);
     }
   }
 

@@ -4,4 +4,8 @@ $corner-margin: 0.75rem;
   position: absolute;
   top: $corner-margin;
   right: $corner-margin;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }

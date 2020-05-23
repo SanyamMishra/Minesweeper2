@@ -1,0 +1,20 @@
+@import './../../mixins';
+@import './../../variables';
+
+$stat-font-size: 2rem;
+$stat-icon-font-size: 2.25rem;
+
+.game-stat {
+  display: inline-flex;
+  align-items: flex-end;
+  font-family: $font-family;
+  font-size: $stat-font-size;
+
+  .stat {
+    margin-right: 8px;
+  }
+
+  &--icon {
+    font-size: $stat-icon-font-size;
+  }
+}

@@ -9,6 +9,7 @@ import { InGameMenu } from '../InGameMenuModule/InGameMenu';
 import { CornerButton, Corner } from '../CornerButtonModule/CornerButton';
 import { Grid, GridOptions } from '../GridModule/Grid';
 import { Popup } from '../PopupModule/Popup';
+import { GameStat } from "../GameStatModule/GameStat";
 import { Timer } from "../TimerModule/Timer";
 
 const mineRevealGapTime = 50;
@@ -50,6 +51,7 @@ export class Game {
   private mediumGrid: Grid;
   private largeGrid: Grid;
   private timer: Timer;
+  private flagCount: GameStat;
   private gameWonPopup: Popup;
   private gameLosePopup: Popup;
 
@@ -65,6 +67,7 @@ export class Game {
     this.mediumGrid = new Grid(mediumGridOptions);
     this.largeGrid = new Grid(largeGridOptions);
     this.timer = new Timer('fas fa-clock');
+    this.flagCount = new GameStat('fas fa-flag');
     this.gameWonPopup = new Popup('Congratulations ✨🎊', 'You won the Game!!', [
       {
         text: 'Cool',
@@ -107,6 +110,14 @@ export class Game {
         this.showGameEndPopup && this.gameLosePopup.show();
       }
     });
+
+    GameState.listen(StateEvent.CELL_FLAG_TOGGLE, eventData => {
+      if (eventData.data === false) {
+        this.flagCount.value++;
+      } else if (eventData.data === true) {
+        this.flagCount.value--;
+      }
+    });
   }
 
   private render() {
@@ -117,6 +128,7 @@ export class Game {
     this.DOMElement.querySelector('template#medium-grid')?.replaceWith(this.mediumGrid.DOMElement);
     this.DOMElement.querySelector('template#large-grid')?.replaceWith(this.largeGrid.DOMElement);
     this.DOMElement.querySelector('template#timer')?.replaceWith(this.timer.DOMElement);
+    this.DOMElement.querySelector('template#flag-count')?.replaceWith(this.flagCount.DOMElement);
     this.DOMElement.querySelector('template#game-won-popup')?.replaceWith(this.gameWonPopup.DOMElement);
     this.DOMElement.querySelector('template#game-lose-popup')?.replaceWith(this.gameLosePopup.DOMElement);
   }
@@ -126,12 +138,15 @@ export class Game {
     this.pauseButton.show();
     switch (eventData.data) {
       case 'smallGridButton':
+        this.flagCount.value = smallGridOptions.totalMines;
         this.smallGrid.show();
         break;
       case 'mediumGridButton':
+        this.flagCount.value = mediumGridOptions.totalMines;
         this.mediumGrid.show();
         break;
       case 'largeGridButton':
+        this.flagCount.value = largeGridOptions.totalMines;
         this.largeGrid.show();
         break;
     }

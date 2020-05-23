@@ -9,7 +9,8 @@ export enum State {
 export enum StateEvent {
   STATE_CHANGED,
   MAIN_MENU_BUTTON_CLICKED,
-  IN_GAME_MENU_BUTTON_CLICKED
+  IN_GAME_MENU_BUTTON_CLICKED,
+  CELL_FLAG_TOGGLE
 }
 
 export type StateEventData = {
